@@ -6,8 +6,8 @@ My thought:
 2. Think of the data structures - employee, shift, conflict.
 3. Build a simple UI for editing.
 4. Add logic functions to detect those conflicts.
-5. Test the core logic first.
-6. Make it reponsive and polish the UI. (and test again)
+5. Make it reponsive and polish the UI.
+6. Add management interactively.
 7. Add bonus requirements and test again.
 8. Finailze the README.
 
@@ -24,3 +24,13 @@ My thought:
         - Implemented core conflict detection utilities in `src/utils/conflicts.ts`:
             - `detectOverlappingShifts(shifts)` — flags overlapping shifts for the same employee on the same day.
             - `detectTooManyConsecutiveDays(shifts, maxConsecutive = 5)` — flags employees scheduled for more than 5 consecutive days.
+
+5. Responsive UI & conflict visuals:
+        - Implemented a responsive roster grid in `src/App.tsx` and `src/App.css`.
+        - Conflicting shift cells are visually flagged (red background) in the roster grid.
+
+6. Employee & shift management (interactive):
+        - Added simple forms in `src/App.tsx` to:
+            - Add, edit and remove employees (name + comma-separated roles).
+            - Create and remove shifts (select employee, role, day, start/end time).
+        - Conflicts are recalculated automatically when shifts change and are shown in the roster grid.
