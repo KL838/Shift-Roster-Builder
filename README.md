@@ -19,3 +19,8 @@ My thought:
 
 3. UI layout:
     - Added CSS and a simple placeholder layout for `App.tsx` containing the employees panel, summary panel, and weekly roster layout grid.
+
+4. Conflict detection:
+        - Implemented core conflict detection utilities in `src/utils/conflicts.ts`:
+            - `detectOverlappingShifts(shifts)` — flags overlapping shifts for the same employee on the same day.
+            - `detectTooManyConsecutiveDays(shifts, maxConsecutive = 5)` — flags employees scheduled for more than 5 consecutive days.

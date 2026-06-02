@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Employee, Shift } from './types';
+import { detectConflicts } from './utils/conflicts';
 import './App.css';
 
 function App() {
@@ -40,7 +41,26 @@ function App() {
           <div className="grid-container" style={{ minHeight: '300px', backgroundColor: '#f9f9f9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '15px' }}>
             <p style={{ color: '#666' }}>Roster grid will be displayed here...</p>
           </div>
-          <button>Add Shift</button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button>Add Shift</button>
+            <button onClick={() => {
+              const sampleShifts: Shift[] = [
+                { id: 's1', employeeId: 'e1', role: 'Cashier', day: 'Monday', startTime: '09:00', endTime: '13:00' },
+                { id: 's2', employeeId: 'e1', role: 'Cashier', day: 'Monday', startTime: '12:00', endTime: '16:00' },
+                { id: 's3', employeeId: 'e1', role: 'Cashier', day: 'Tuesday', startTime: '09:00', endTime: '17:00' },
+                { id: 's4', employeeId: 'e1', role: 'Cashier', day: 'Wednesday', startTime: '09:00', endTime: '17:00' },
+                { id: 's5', employeeId: 'e1', role: 'Cashier', day: 'Thursday', startTime: '09:00', endTime: '17:00' },
+                { id: 's6', employeeId: 'e1', role: 'Cashier', day: 'Friday', startTime: '09:00', endTime: '17:00' },
+                { id: 's7', employeeId: 'e1', role: 'Cashier', day: 'Saturday', startTime: '09:00', endTime: '17:00' },
+                { id: 's8', employeeId: 'e2', role: 'Cook', day: 'Monday', startTime: '08:00', endTime: '12:00' },
+              ];
+              const conflicts = detectConflicts(sampleShifts);
+              // log to browser console (open DevTools to inspect)
+              // eslint-disable-next-line no-console
+              console.log('Demo conflicts', conflicts);
+              alert(`Found ${conflicts.length} conflict(s) — see console for details.`);
+            }}>Run Conflict Demo</button>
+          </div>
         </section>
       </main>
     </div>
