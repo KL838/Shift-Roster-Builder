@@ -12,3 +12,6 @@ My thought:
 
 1. Initialize:
     - Vite React + TS setup completed.
+
+2. Data structures:
+    - Defined `Employee`, `Shift`, and `Conflict` interfaces in `src/types/index.ts`.
