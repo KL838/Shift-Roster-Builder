@@ -1,0 +1,59 @@
+INTERNSHIP CODING CHALLENGE
+Option A: Shift Roster Builder  |  Take-Home Assignment
+1.  Overview
+You will build a Shift Roster Builder: a web application that lets a manager create and manage a weekly staff schedule for a small team.
+Tag: Core roster task  —  Assign staff to shifts across a 7-day week, view a schedule grid, and catch conflicts.
+
+2.  What to build
+Core requirements (must have)
+Your app must implement all of the following:
+•	Add, edit, and remove employees. Each employee has a name and one or more roles (e.g. Cashier, Supervisor, Cook).
+•	Assign an employee to a specific day and time slot (e.g. Monday 09:00–17:00).
+•	Display all assignments in a weekly grid — days as columns, employees (or time slots) as rows.
+•	Detect and visually flag at least one conflict: an employee assigned to two overlapping shifts on the same day, or scheduled more than 5 consecutive days.
+•	Show a summary panel: total hours assigned per employee for the week.
+
+Stretch goals (optional — only if the core is solid)
+•	Drag-and-drop to reassign a shift to a different employee or day.
+•	Employee availability preferences (e.g. “Alex cannot work Mondays”) that pre-validate assignments.
+•	Print-friendly or CSV export of the weekly roster.
+•	Mobile-responsive layout.
+
+3.  Technical guidelines
+Stack
+You may use any frontend framework or plain HTML/CSS/JS. Suggestions:
+•	React + Vite (recommended for complex state)
+•	Next.js
+•	Plain HTML / CSS / JavaScript
+
+All data may be stored in-memory (no backend or database required). If you use localStorage, document it in the README.
+Rules
+•	The app must run locally with no more than two terminal commands (e.g. npm install && npm run dev).
+•	No third-party scheduling or roster SaaS libraries — the scheduling/business logic must be your own.
+•	You are encouraged to use AI coding tools (Cursor, GitHub Copilot, Claude, ChatGPT, etc.). This is expected.
+
+4.  Submission instructions
+1.	Push your code to a public GitHub repository (or supply a ZIP file if you do not have a GitHub account).
+2.	Include a README.md with: setup instructions, a brief description of your design decisions, and a screenshot or short screen recording of the app running.
+3.	Submit the link (or ZIP) to your recruiter email.
+
+5.  How you will be assessed 
+You will be assessed across four areas. Full criteria are in the separate Marking Rubric.
+Area	                    Description	                                            Weight
+Code Quality & Structure	Organisation, naming, error handling, commit history	30%
+UI / UX Design	            Clarity, visual hierarchy, status feedback, polish	    30%
+Problem Decomposition	    README, data model reasoning, architecture decisions	25%
+Functionality & Correctness	Does the app do what it says? Are edge cases handled?	15%
+
+6.  Hints
+•	Sketch your data model before writing any code. What are the key objects? What fields do they need?
+•	Commit often so we can see your progress. Meaningful commit messages count.
+•	Prioritise a clean, working core over a buggy app with every stretch goal attempted.
+•	If you hit a dead end, document it in the README. Honest reflection is valued.
+
+Remember
+We are assessing how you think and build, not just what you ship.
+A simple, well-structured app with a clear README will score higher than a complex,
+broken app with no explanation.
+
+Good luck — we look forward to seeing what you build.
