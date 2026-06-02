@@ -34,3 +34,4 @@ My thought:
             - Add, edit and remove employees (name + comma-separated roles).
             - Create and remove shifts (select employee, role, day, start/end time).
         - Conflicts are recalculated automatically when shifts change and are shown in the roster grid.
+        - Display the total hours assigned per employee for the week.

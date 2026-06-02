@@ -2,7 +2,7 @@ import type { Shift, Conflict } from '../types';
 
 const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as const;
 
-function timeToMinutes(time: string): number {
+export function timeToMinutes(time: string): number {
   const [h = '0', m = '0'] = time.split(':');
   const hh = Number(h);
   const mm = Number(m);

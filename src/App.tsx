@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { Employee, Shift, Conflict } from './types';
-import { detectConflicts } from './utils/conflicts';
+import { detectConflicts, timeToMinutes } from './utils/conflicts';
 import './App.css';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
@@ -130,7 +130,26 @@ function App() {
 
           <section className="summary-panel" style={{ marginTop: 12 }}>
             <h2>Summary</h2>
-            <p>Assigned hours and simple stats will go here.</p>
+              {employees.length === 0 ? (
+                <p>Assigned hours and simple stats will go here.</p>
+              ) : (
+                <div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    {employees.map(emp => {
+                      const mins = shifts
+                        .filter(s => s.employeeId === emp.id)
+                        .reduce((sum, s) => sum + Math.max(0, timeToMinutes(s.endTime) - timeToMinutes(s.startTime)), 0);
+                      const hrs = Math.floor(mins / 60);
+                      const rem = mins % 60;
+                      return (
+                        <li key={emp.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                          <strong>{emp.name}</strong>: {hrs}h {rem}m
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
           </section>
         </aside>
 
@@ -152,7 +171,7 @@ function App() {
             <input type="time" value={shiftStart} onChange={e => setShiftStart(e.target.value)} />
             <input type="time" value={shiftEnd} onChange={e => setShiftEnd(e.target.value)} />
             <button type="submit">Add Shift</button>
-            <button type="button" onClick={() => { setEmployees([]); setShifts([]); setConflicts([]); }} style={{ marginLeft: 6 }}>Clear</button>
+            <button type="button" onClick={() => { setEmployees([]); setShifts([]); setConflicts([]); }} style={{ marginLeft: 'auto' }}>Clear All</button>
           </form>
 
           <div className="grid-scroll">
@@ -181,7 +200,7 @@ function App() {
                                     <div className="shift-role">{s.role}</div>
                                   </div>
                                   <div>
-                                    <button className="btn-small" onClick={() => removeShift(s.id)}>Remove</button>
+                                    <button className="btn-small btn-cross" onClick={() => removeShift(s.id)} aria-label="Remove shift">✕</button>
                                   </div>
                                 </div>
                               </div>
