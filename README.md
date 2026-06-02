@@ -35,3 +35,6 @@ My thought:
             - Create and remove shifts (select employee, role, day, start/end time).
         - Conflicts are recalculated automatically when shifts change and are shown in the roster grid.
         - Display the total hours assigned per employee for the week.
+
+7. Persistence:
+    - Employee and shift data are persisted to browser *localStorage* (keys: `roster.employees` and `roster.shifts`) so data remains after a page refresh.

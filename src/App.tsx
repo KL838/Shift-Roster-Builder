@@ -33,6 +33,43 @@ function App() {
     setShiftRole(emp?.roles?.[0] ?? '');
   }, [selectedEmployeeId, employees]);
 
+  // LocalStorage persistence
+  const STORAGE_KEYS = { employees: 'roster.employees', shifts: 'roster.shifts' } as const;
+
+  // Hydrate state from localStorage on mount
+  useEffect(() => {
+    try {
+      const rawEmp = localStorage.getItem(STORAGE_KEYS.employees);
+      if (rawEmp) setEmployees(JSON.parse(rawEmp));
+      const rawShifts = localStorage.getItem(STORAGE_KEYS.shifts);
+      if (rawShifts) setShifts(JSON.parse(rawShifts));
+    } catch (err) {
+      // ignore malformed data
+      // eslint-disable-next-line no-console
+      console.warn('Failed to hydrate roster from localStorage', err);
+    }
+  }, []);
+
+  // Save employees
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.employees, JSON.stringify(employees));
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to save employees to localStorage', err);
+    }
+  }, [employees]);
+
+  // Save shifts
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.shifts, JSON.stringify(shifts));
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to save shifts to localStorage', err);
+    }
+  }, [shifts]);
+
   const addOrUpdateEmployee = (e?: React.FormEvent) => {
     e?.preventDefault();
     const roles = rolesInput.split(',').map(r => r.trim()).filter(Boolean);
