@@ -1,4 +1,5 @@
 # Shift Roster Builder
+Run by: npm install && npm run dev
 
 My thought:
 1. Initialize the project & README and also the git.
@@ -15,3 +16,6 @@ My thought:
 
 2. Data structures:
     - Defined `Employee`, `Shift`, and `Conflict` interfaces in `src/types/index.ts`.
+
+3. UI layout:
+    - Added CSS and a simple placeholder layout for `App.tsx` containing the employees panel, summary panel, and weekly roster layout grid.
