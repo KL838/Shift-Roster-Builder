@@ -1,3 +1,5 @@
+# Shift Roster Builder
+
 My thought:
 1. Initialize the project & README and also the git.
 2. Think of the data structures - employee, shift, conflict.
@@ -7,3 +9,6 @@ My thought:
 6. Make it reponsive and polish the UI. (and test again)
 7. Add bonus requirements and test again.
 8. Finailze the README.
+
+1. Initialize:
+    - Vite React + TS setup completed.
