@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import type { Employee, Shift, Conflict, DayOfWeek } from './types';
+import type { Employee, Shift, Conflict, DayOfWeek, Role } from './types';
+import { PREDEFINED_ROLES } from './types';
 import { detectConflicts, timeToMinutes } from './utils/conflicts';
 import './App.css';
 
@@ -20,6 +21,18 @@ function App() {
   const [rolesInput, setRolesInput] = useState('');
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
   const [unavailableDaysSelection, setUnavailableDaysSelection] = useState<DayOfWeek[]>([]);
+
+  const currentRoleToken = rolesInput.split(',').pop()?.trim() ?? '';
+  const currentRoleValues = rolesInput.split(',').map(r => r.trim()).filter(Boolean);
+  const roleSuggestions = currentRoleToken.length > 0
+    ? PREDEFINED_ROLES.filter(role => role.toLowerCase().includes(currentRoleToken.toLowerCase()) && !currentRoleValues.includes(role))
+    : [];
+
+  const chooseRoleSuggestion = (role: Role) => {
+    const segments = rolesInput.split(',');
+    segments[segments.length - 1] = ` ${role}`;
+    setRolesInput(segments.join(',').replace(/^\s+/, '').replace(/,\s*,/g, ',').replace(/\s+$/, '') + ', ');
+  };
 
   const toggleUnavailableDay = (d: DayOfWeek) => {
     setUnavailableDaysSelection(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
@@ -210,6 +223,15 @@ function App() {
               </div>
               <div className="form-row">
                 <input placeholder="Roles (comma-separated)" value={rolesInput} onChange={ev => setRolesInput(ev.target.value)} />
+                {roleSuggestions.length > 0 && (
+                  <div className="suggestions-list">
+                    {roleSuggestions.map(role => (
+                      <button key={role} type="button" className="suggestion-item" onMouseDown={() => chooseRoleSuggestion(role)}>
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="form-row">
                 <label style={{ display: 'block', marginTop: 6, fontSize: 12 }}>Unavailable days:</label>

@@ -50,3 +50,7 @@ My thought:
 10. Print-friendly or CSV export of the weekly roster:
     - Click **Export PNG** in the Summary panel to download a PNG image of the timetable (remove buttons hidden during capture).
     - Click **Export CSV** in the Summary panel to download a CSV list of shifts (columns: Employee, Day, Role, Start, End, DurationMinutes).
+
+11. Mobile-responsive layout:
+    - The app stacks the panels on small screens, keeps the weekly roster horizontally scrollable, and makes form controls fill the available width on mobile.
+    - Can test in browser by cmd+f12 and cmd+shift+m.

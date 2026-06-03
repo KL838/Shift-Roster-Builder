@@ -1,4 +1,4 @@
-export const PREDEFINED_ROLES = ['Cashier', 'Supervisor', 'Cook', 'Floor'] as const;
+export const PREDEFINED_ROLES = ['Cashier', 'Supervisor', 'Cook', 'Floor', 'Manager', 'Dishwasher'] as const;
 export type Role = typeof PREDEFINED_ROLES[number] | (string & {});
 
 export interface Employee {
