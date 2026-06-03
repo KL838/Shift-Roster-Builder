@@ -11,6 +11,8 @@ function App() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [conflicts, setConflicts] = useState<Conflict[]>([]);
+  const [draggingShiftId, setDraggingShiftId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<string | null>(null);
 
   // Employee form state
   const [name, setName] = useState('');
@@ -121,8 +123,21 @@ function App() {
     setShifts(prev => prev.filter(s => s.id !== id));
   };
 
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData('text/plain', id);
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingShiftId(id);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingShiftId(null);
+    setDropTarget(null);
+  };
+
   const conflictShiftIds = new Set<string>();
   conflicts.forEach(c => c.shiftIds?.forEach(id => conflictShiftIds.add(id)));
+
+  const draggingShift = shifts.find(s => s.id === draggingShiftId) ?? null;
 
   return (
     <div className="app-container">
@@ -168,7 +183,7 @@ function App() {
           <section className="summary-panel" style={{ marginTop: 12 }}>
             <h2>Summary</h2>
               {employees.length === 0 ? (
-                <p>Assigned hours and simple stats will go here.</p>
+                <p>Assigned hours of each employee will go here.</p>
               ) : (
                 <div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -226,22 +241,59 @@ function App() {
                     {DAYS.map(day => {
                       const cellShifts = shifts.filter(s => s.employeeId === emp.id && s.day === day);
                       const cellHasConflict = cellShifts.some(s => conflictShiftIds.has(s.id));
+                      const targetKey = `${emp.id}::${day}`;
+                      const isDropTarget = dropTarget === targetKey;
                       return (
-                        <td key={day} className={cellHasConflict ? 'cell-conflict' : ''}>
-                          {cellShifts.length === 0 ? <div className="empty-cell">—</div> : (
-                            cellShifts.map(s => (
-                              <div key={s.id} className={`shift-item ${conflictShiftIds.has(s.id) ? 'conflict' : ''}`}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
-                                  <div>
-                                    <div className="shift-time">{s.startTime}–{s.endTime}</div>
-                                    <div className="shift-role">{s.role}</div>
-                                  </div>
-                                  <div>
-                                    <button className="btn-small btn-cross" onClick={() => removeShift(s.id)} aria-label="Remove shift">✕</button>
+                        <td key={day}
+                          className={`${cellHasConflict ? 'cell-conflict' : ''} ${isDropTarget ? 'cell-drop-target' : ''}`}
+                          onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDropTarget(targetKey); }}
+                          onDragEnter={() => setDropTarget(targetKey)}
+                          onDragLeave={() => setDropTarget(null)}
+                          onDrop={e => {
+                            e.preventDefault();
+                            const id = e.dataTransfer.getData('text/plain');
+                            if (!id) return;
+                            setShifts(prev => prev.map(s => s.id === id ? { ...s, employeeId: emp.id, day } : s));
+                            setDropTarget(null);
+                            setDraggingShiftId(null);
+                          }}
+                        >
+                          {cellShifts.length === 0 ? (
+                            // show preview if dragging and target is different
+                            isDropTarget && draggingShift && (draggingShift.employeeId !== emp.id || draggingShift.day !== day) ? (
+                              <div className="shift-preview">
+                                <div className="shift-time">{draggingShift.startTime}–{draggingShift.endTime}</div>
+                                <div className="shift-role">{draggingShift.role}</div>
+                              </div>
+                            ) : (
+                              <div className="empty-cell">—</div>
+                            )
+                          ) : (
+                            <>
+                              {cellShifts.map(s => (
+                                <div key={s.id}
+                                  draggable
+                                  onDragStart={ev => handleDragStart(ev, s.id)}
+                                  onDragEnd={handleDragEnd}
+                                  className={`shift-item ${conflictShiftIds.has(s.id) ? 'conflict' : ''} ${draggingShiftId === s.id ? 'dragging' : ''}`}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
+                                    <div>
+                                      <div className="shift-time">{s.startTime}–{s.endTime}</div>
+                                      <div className="shift-role">{s.role}</div>
+                                    </div>
+                                    <div>
+                                      <button className="btn-small btn-cross" onClick={() => removeShift(s.id)} aria-label="Remove shift">✕</button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))
+                              ))}
+                              {isDropTarget && draggingShift && (draggingShift.employeeId !== emp.id || draggingShift.day !== day) && (
+                                <div className="shift-preview">
+                                  <div className="shift-time">{draggingShift.startTime}–{draggingShift.endTime}</div>
+                                  <div className="shift-role">{draggingShift.role}</div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </td>
                       );

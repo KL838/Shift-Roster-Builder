@@ -15,7 +15,7 @@ header h1 { margin: 0; font-size: 24px; color: var(--text); }
 
 /* Roster table */
 .grid-scroll, .roster-scroll { overflow-x: auto; }
-.roster-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.roster-table { width: 100%; border-collapse: collapse; min-width: 800px; }
 .roster-table thead th { background: var(--table-head-bg, #fafafa); color: var(--text-h); text-align: left; padding: 6px 2px; font-size: 11px; border-bottom: 1px solid var(--border); }
 .roster-table td { border: 1px solid var(--border); padding: 8px; vertical-align: top; background: var(--table-cell-bg, #fbfbfb); }
 .name-col, .employee-cell { width: 70px; font-weight: 600; background: var(--table-head-bg, #fafafa); }
@@ -51,4 +51,15 @@ header h1 { margin: 0; font-size: 24px; color: var(--text); }
 @media (max-width: 480px) {
 	.roster-table thead th, .roster-table td { padding: 4px 2px; font-size: 12px; }
 }
+
+/* Drag & drop styles */
+.shift-item[draggable] { cursor: grab; }
+.shift-item.dragging { opacity: 0.6; transform: scale(0.99); }
+.cell-drop-target { outline: 2px dashed var(--text-h); background: rgba(255,255,255,0.03); transition: background 120ms ease, outline-color 120ms ease; }
+.cell-drop-target .shift-preview { opacity: 1; transform: translateY(0); }
+
+/* Preview tile while dragging */
+.shift-preview { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px dashed var(--text-h); padding: 6px; border-radius: 6px; margin-bottom: 4px; opacity: 0.85; }
+.shift-preview .shift-time { font-weight:600; font-size: 11px; color: var(--text-h); }
+.shift-preview .shift-role { font-size: 11px; color: var(--text); opacity: 0.9; }
 

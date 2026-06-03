@@ -38,3 +38,7 @@ My thought:
 
 7. Persistence:
     - Employee and shift data are persisted to browser *localStorage* (keys: `roster.employees` and `roster.shifts`) so data remains after a page refresh.
+
+8. Drag-and-drop to reassign a shift:
+    - You can drag a shift tile and drop it onto another employee's day cell to move the shift to that employee and/or day.
+    - This was implemented using HTML5 drag-and-drop.
