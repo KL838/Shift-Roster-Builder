@@ -1,0 +1,14 @@
+Employee,Day,Role,Start,End,DurationMinutes
+"test",Wednesday,Supervisor,09:00,17:00,480
+"test",Saturday,Supervisor,09:00,17:00,480
+"test",Sunday,Supervisor,09:00,17:00,480
+"test",Tuesday,Supervisor,09:00,17:00,480
+"testtest",Monday,Floor,09:00,17:00,480
+"testtest",Tuesday,Floor,09:00,17:00,480
+"testtest",Wednesday,Floor,09:00,17:00,480
+"testtest",Friday,Floor,09:00,17:00,480
+"testtest",Thursday,Floor,09:00,17:00,480
+"testtest",Saturday,Floor,09:00,17:00,480
+"test",Sunday,Supervisor,15:00,20:00,300
+"Yo",Sunday,Boss,09:00,20:00,660
+"Yo",Saturday,Cashier,09:00,20:00,660
