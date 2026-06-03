@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { Employee, Shift, Conflict, DayOfWeek } from './types';
 import { detectConflicts, timeToMinutes } from './utils/conflicts';
 import './App.css';
@@ -13,6 +13,7 @@ function App() {
   const [conflicts, setConflicts] = useState<Conflict[]>([]);
   const [draggingShiftId, setDraggingShiftId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const timetableRef = useRef<HTMLDivElement | null>(null);
 
   // Employee form state
   const [name, setName] = useState('');
@@ -143,6 +144,50 @@ function App() {
     setDropTarget(null);
   };
 
+  const exportCsv = () => {
+    // Rows: Employee, Day, Role, Start, End, Duration (minutes)
+    const rows: string[] = [];
+    rows.push(['Employee', 'Day', 'Role', 'Start', 'End', 'DurationMinutes'].join(','));
+    shifts.forEach(s => {
+      const emp = employees.find(e => e.id === s.employeeId);
+      const duration = Math.max(0, timeToMinutes(s.endTime) - timeToMinutes(s.startTime));
+      rows.push([`"${emp?.name ?? s.employeeId}"`, s.day, s.role, s.startTime, s.endTime, String(duration)].join(','));
+    });
+    const csv = rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'roster.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPng = async () => {
+    const el = timetableRef.current;
+    if (!el) { alert('Roster area not found'); return; }
+    // Add class to hide remove buttons during capture
+    el.classList.add('exporting');
+    try {
+      // dynamic import to avoid requiring dependency at build-time if not installed
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = await import('html2canvas');
+      const html2canvas = (mod as any).default ?? mod;
+      const canvas = await html2canvas(el as HTMLElement, { backgroundColor: '#ffffff', scale: 2 });
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'roster.png';
+      a.click();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Export PNG failed', err);
+      alert('Export PNG failed — check console for details.');
+    } finally {
+      el.classList.remove('exporting');
+    }
+  };
+
   const conflictShiftIds = new Set<string>();
   conflicts.forEach(c => c.shiftIds?.forEach(id => conflictShiftIds.add(id)));
 
@@ -191,7 +236,7 @@ function App() {
                       <span>
                         {emp.name} — <small style={{ color: '#555' }}>{emp.roles.join(', ')}</small>
                         {emp.unavailableDays && emp.unavailableDays.length > 0 && (
-                          <div style={{ fontSize: 11, color: '#b00', marginTop: 4 }}>Unavailable: {emp.unavailableDays.join(', ')}</div>
+                          <div style={{ fontSize: 11, color: '#FF6E6E', marginTop: 4 }}>Unavailable: {emp.unavailableDays.join(', ')}</div>
                         )}
                       </span>
                       <span>
@@ -225,6 +270,10 @@ function App() {
                       );
                     })}
                   </ul>
+                  <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
+                    <button onClick={exportPng} className="btn-small">Export PNG</button>
+                    <button onClick={exportCsv} className="btn-small">Export CSV</button>
+                  </div>
                 </div>
               )}
           </section>
@@ -251,7 +300,7 @@ function App() {
             <button type="button" onClick={() => { setEmployees([]); setShifts([]); setConflicts([]); }} style={{ marginLeft: 'auto' }}>Clear All</button>
           </form>
 
-          <div className="grid-scroll">
+          <div className="grid-scroll" ref={timetableRef}>
             <table className="roster-table">
               <thead>
                 <tr>
@@ -269,10 +318,10 @@ function App() {
                       const cellHasConflict = cellShifts.some(s => conflictShiftIds.has(s.id));
                       const targetKey = `${emp.id}::${day}`;
                       const isDropTarget = dropTarget === targetKey;
+                      const overlayId = (`stripe-${emp.id}-${day}`).replace(/\s+/g, '');
                       return (
                         <td key={day}
-                          className={`${cellHasConflict ? 'cell-conflict' : ''} ${isDropTarget ? 'cell-drop-target' : ''}`}
-                          style={isUnavailable ? { opacity: 0.7 } : undefined}
+                          className={`${cellHasConflict ? 'cell-conflict' : ''} ${isDropTarget ? 'cell-drop-target' : ''} ${isUnavailable ? 'cell-unavailable' : ''}`}
                           onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDropTarget(targetKey); }}
                           onDragEnter={() => setDropTarget(targetKey)}
                           onDragLeave={() => setDropTarget(null)}
@@ -291,6 +340,19 @@ function App() {
                             setDraggingShiftId(null);
                           }}
                         >
+                          {isUnavailable && (
+                            <svg className="unavailable-overlay" aria-hidden="true" viewBox="0 0 12 12" preserveAspectRatio="none">
+                              <defs>
+                                    <pattern id={overlayId} patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                                      <rect x="0" y="0" width="2" height="8" fill="#b10000" />
+                                      <rect x="2" y="0" width="2" height="8" fill="#cc0000" />
+                                      <rect x="4" y="0" width="2" height="8" fill="#b10000" />
+                                      <rect x="6" y="0" width="2" height="8" fill="#cc0000" />
+                                    </pattern>
+                              </defs>
+                              <rect width="100%" height="100%" fill={`url(#${overlayId})`} />
+                            </svg>
+                          )}
                           {cellShifts.length === 0 ? (
                             // show preview if dragging and target is different
                             isDropTarget && draggingShift && (draggingShift.employeeId !== emp.id || draggingShift.day !== day) ? (

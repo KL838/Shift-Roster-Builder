@@ -17,7 +17,7 @@ header h1 { margin: 0; font-size: 24px; color: var(--text); }
 .grid-scroll, .roster-scroll { overflow-x: auto; }
 .roster-table { width: 100%; border-collapse: collapse; min-width: 800px; }
 .roster-table thead th { background: var(--table-head-bg, #fafafa); color: var(--text-h); text-align: left; padding: 6px 2px; font-size: 11px; border-bottom: 1px solid var(--border); }
-.roster-table td { border: 1px solid var(--border); padding: 8px; vertical-align: top; background: var(--table-cell-bg, #fbfbfb); }
+.roster-table td { border: 1px solid var(--border); padding: 8px; vertical-align: top; background: var(--table-cell-bg, #fbfbfb); position: relative; }
 .name-col, .employee-cell { width: 70px; font-weight: 600; background: var(--table-head-bg, #fafafa); }
 
 .shift-item { background: var(--shift-bg, #f3fbff); padding: 4px; border-radius: 6px; margin-bottom: 2px; display: block; box-sizing: border-box; }
@@ -62,4 +62,25 @@ header h1 { margin: 0; font-size: 24px; color: var(--text); }
 .shift-preview { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px dashed var(--text-h); padding: 6px; border-radius: 6px; margin-bottom: 4px; opacity: 0.85; }
 .shift-preview .shift-time { font-weight:600; font-size: 11px; color: var(--text-h); }
 .shift-preview .shift-role { font-size: 11px; color: var(--text); opacity: 0.9; }
+
+/* When capturing/exporting, hide remove buttons inside the exported area */
+.exporting .btn-cross { display: none !important; }
+
+/* Explicit unavailable-cell gradient — use rgba stops and !important so html2canvas preserves it */
+.cell-unavailable {
+	/* fallback for clients that render background-image on the td itself */
+	background-image: repeating-linear-gradient(45deg, rgba(170,0,0,0.95) 0 6px, rgba(200,0,0,0.95) 6px 12px) !important;
+}
+
+/* Overlay element to ensure html2canvas captures the pattern reliably */
+.unavailable-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	width: 100%;
+	height: 100%;
+}
+
+.shift-item, .shift-preview { position: relative; z-index: 1; }
 

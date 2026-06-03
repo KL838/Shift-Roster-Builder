@@ -46,3 +46,7 @@ My thought:
 9. Allow Employee availability preferences (e.g. “Alex cannot work Mondays”) that pre-validate assignments
     - You cannot assign employees to their Unavailable Days.
     - An pop-up alert will be triggered when you try so.
+
+10. Print-friendly or CSV export of the weekly roster:
+    - Click **Export PNG** in the Summary panel to download a PNG image of the timetable (remove buttons hidden during capture).
+    - Click **Export CSV** in the Summary panel to download a CSV list of shifts (columns: Employee, Day, Role, Start, End, DurationMinutes).
