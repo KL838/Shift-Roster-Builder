@@ -42,3 +42,7 @@ My thought:
 8. Drag-and-drop to reassign a shift:
     - You can drag a shift tile and drop it onto another employee's day cell to move the shift to that employee and/or day.
     - This was implemented using HTML5 drag-and-drop.
+
+9. Allow Employee availability preferences (e.g. “Alex cannot work Mondays”) that pre-validate assignments
+    - You cannot assign employees to their Unavailable Days.
+    - An pop-up alert will be triggered when you try so.

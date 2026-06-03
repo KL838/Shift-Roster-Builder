@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { Employee, Shift, Conflict } from './types';
+import type { Employee, Shift, Conflict, DayOfWeek } from './types';
 import { detectConflicts, timeToMinutes } from './utils/conflicts';
 import './App.css';
 
@@ -18,6 +18,11 @@ function App() {
   const [name, setName] = useState('');
   const [rolesInput, setRolesInput] = useState('');
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
+  const [unavailableDaysSelection, setUnavailableDaysSelection] = useState<DayOfWeek[]>([]);
+
+  const toggleUnavailableDay = (d: DayOfWeek) => {
+    setUnavailableDaysSelection(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
+  };
 
   // Shift form state
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
@@ -81,21 +86,23 @@ function App() {
     }
 
     if (editingEmployeeId) {
-      setEmployees(prev => prev.map(emp => emp.id === editingEmployeeId ? { ...emp, name: name.trim(), roles } : emp));
+      setEmployees(prev => prev.map(emp => emp.id === editingEmployeeId ? { ...emp, name: name.trim(), roles, unavailableDays: unavailableDaysSelection } : emp));
       setEditingEmployeeId(null);
     } else {
-      const newEmp: Employee = { id: uid(), name: name.trim(), roles };
+      const newEmp: Employee = { id: uid(), name: name.trim(), roles, unavailableDays: unavailableDaysSelection };
       setEmployees(prev => [...prev, newEmp]);
     }
 
     setName('');
     setRolesInput('');
+    setUnavailableDaysSelection([]);
   };
 
   const startEditEmployee = (emp: Employee) => {
     setEditingEmployeeId(emp.id);
     setName(emp.name);
     setRolesInput(emp.roles.join(', '));
+    setUnavailableDaysSelection(emp.unavailableDays ?? []);
   };
 
   const removeEmployee = (id: string) => {
@@ -108,6 +115,8 @@ function App() {
     e?.preventDefault();
     if (!selectedEmployeeId) { alert('Select an employee'); return; }
     if (!shiftRole) { alert('Select a role for the shift'); return; }
+    const emp = employees.find(x => x.id === selectedEmployeeId);
+    if (emp?.unavailableDays?.includes(shiftDay as DayOfWeek)) { alert(`${emp.name} is unavailable on ${shiftDay}`); return; }
     const newShift: Shift = {
       id: uid(),
       employeeId: selectedEmployeeId,
@@ -157,6 +166,17 @@ function App() {
               <div className="form-row">
                 <input placeholder="Roles (comma-separated)" value={rolesInput} onChange={ev => setRolesInput(ev.target.value)} />
               </div>
+              <div className="form-row">
+                <label style={{ display: 'block', marginTop: 6, fontSize: 12 }}>Unavailable days:</label>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                  {DAYS.map(d => (
+                    <label key={d} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input type="checkbox" checked={unavailableDaysSelection.includes(d as DayOfWeek)} onChange={() => toggleUnavailableDay(d as DayOfWeek)} />
+                      <span style={{ fontSize: 13 }}>{d.slice(0,3)}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
               <div style={{ marginTop: 8 }}>
                 <button type="submit">{editingEmployeeId ? 'Save Employee' : 'Add Employee'}</button>
                 {editingEmployeeId && <button type="button" onClick={() => { setEditingEmployeeId(null); setName(''); setRolesInput(''); }} style={{ marginLeft: 8 }}>Cancel</button>}
@@ -168,7 +188,12 @@ function App() {
                 <ul>
                   {employees.map(emp => (
                     <li key={emp.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
-                      <span>{emp.name} — <small style={{ color: '#555' }}>{emp.roles.join(', ')}</small></span>
+                      <span>
+                        {emp.name} — <small style={{ color: '#555' }}>{emp.roles.join(', ')}</small>
+                        {emp.unavailableDays && emp.unavailableDays.length > 0 && (
+                          <div style={{ fontSize: 11, color: '#b00', marginTop: 4 }}>Unavailable: {emp.unavailableDays.join(', ')}</div>
+                        )}
+                      </span>
                       <span>
                         <button onClick={() => startEditEmployee(emp)} className="btn-small">Edit</button>
                         <button onClick={() => removeEmployee(emp.id)} className="btn-small" style={{ marginLeft: 6 }}>Delete</button>
@@ -239,6 +264,7 @@ function App() {
                   <tr key={emp.id}>
                     <td className="name-col">{emp.name}</td>
                     {DAYS.map(day => {
+                      const isUnavailable = emp.unavailableDays?.includes(day as DayOfWeek);
                       const cellShifts = shifts.filter(s => s.employeeId === emp.id && s.day === day);
                       const cellHasConflict = cellShifts.some(s => conflictShiftIds.has(s.id));
                       const targetKey = `${emp.id}::${day}`;
@@ -246,6 +272,7 @@ function App() {
                       return (
                         <td key={day}
                           className={`${cellHasConflict ? 'cell-conflict' : ''} ${isDropTarget ? 'cell-drop-target' : ''}`}
+                          style={isUnavailable ? { opacity: 0.7 } : undefined}
                           onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDropTarget(targetKey); }}
                           onDragEnter={() => setDropTarget(targetKey)}
                           onDragLeave={() => setDropTarget(null)}
@@ -253,6 +280,12 @@ function App() {
                             e.preventDefault();
                             const id = e.dataTransfer.getData('text/plain');
                             if (!id) return;
+                            if (isUnavailable) {
+                              alert(`${emp.name} is unavailable on ${day}`);
+                              setDropTarget(null);
+                              setDraggingShiftId(null);
+                              return;
+                            }
                             setShifts(prev => prev.map(s => s.id === id ? { ...s, employeeId: emp.id, day } : s));
                             setDropTarget(null);
                             setDraggingShiftId(null);
